@@ -1,5 +1,8 @@
 var EMBED_BASE = "https://www.gandhijay.com/yt-embed.html?id=";
-var QUOTE_API_URL = "https://type.fit/api/quotes";
+var QUOTE_API_URLS = [
+  "https://type.fit/api/quotes",
+  "https://zenquotes.io/api/quotes",
+];
 
 (function () {
   var params = new URLSearchParams(location.search);
@@ -33,58 +36,104 @@ var QUOTE_API_URL = "https://type.fit/api/quotes";
 
     if (!data.disableApiQuotes) {
       var QUOTE_CACHE_KEY = "quoteCache";
-      var CACHE_MAX = 50;
-      var CACHE_REFILL_AT = 8;
 
       chrome.storage.local.get(QUOTE_CACHE_KEY, function (result) {
-        var cache = result[QUOTE_CACHE_KEY] || { pool: [] };
+        var cache = { quotes: [], fetchedAt: 0 };
+        if (result[QUOTE_CACHE_KEY]) {
+          var raw = result[QUOTE_CACHE_KEY];
+          if (raw.quotes) cache.quotes = raw.quotes;
+          if (raw.fetchedAt) cache.fetchedAt = raw.fetchedAt;
+        }
         var fetchedThisPage = false;
 
-        function fetchAndRefill(callback) {
+        function sameDay(a, b) {
+          var da = new Date(a);
+          var db = new Date(b);
+          return (
+            da.getFullYear() === db.getFullYear() &&
+            da.getMonth() === db.getMonth() &&
+            da.getDate() === db.getDate()
+          );
+        }
+
+        function pickRandom(arr) {
+          return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function normalizeQuotes(list) {
+          var out = [];
+          for (var i = 0; i < list.length; i++) {
+            var item = list[i];
+            var text = item.text || item.q;
+            var author = item.author || item.a || "";
+            if (text) out.push({ text: text, author: author });
+          }
+          return out;
+        }
+
+        function fetchFresh(callback) {
           if (fetchedThisPage) {
             if (callback) callback();
             return;
           }
           fetchedThisPage = true;
-          fetch(QUOTE_API_URL)
-            .then(function (res) {
-              if (!res.ok) throw new Error("HTTP " + res.status);
-              return res.json();
-            })
-            .then(function (list) {
-              if (list && list.length > 0) {
-                for (var i = list.length - 1; i > 0; i--) {
-                  var j = Math.floor(Math.random() * (i + 1));
-                  var tmp = list[i];
-                  list[i] = list[j];
-                  list[j] = tmp;
-                }
-                cache.pool = list.slice(0, CACHE_MAX);
-                chrome.storage.local.set({ [QUOTE_CACHE_KEY]: cache });
+
+          cache.fetchedAt = Date.now();
+          chrome.storage.local.set({ [QUOTE_CACHE_KEY]: cache });
+
+          var promises = QUOTE_API_URLS.map(function (url) {
+            return fetch(url)
+              .then(function (res) {
+                if (!res.ok) throw new Error("HTTP " + res.status);
+                return res.json();
+              })
+              .catch(function () {
+                return [];
+              });
+          });
+
+          Promise.allSettled(promises).then(function (results) {
+            var allQuotes = [];
+            for (var i = 0; i < results.length; i++) {
+              if (results[i].status === "fulfilled" && results[i].value.length) {
+                allQuotes = allQuotes.concat(
+                  normalizeQuotes(results[i].value)
+                );
               }
-              if (callback) callback();
-            })
-            .catch(function () {
-              if (callback) callback();
-            });
+            }
+
+            if (allQuotes.length > 0) {
+              for (var i = allQuotes.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var tmp = allQuotes[i];
+                allQuotes[i] = allQuotes[j];
+                allQuotes[j] = tmp;
+              }
+              cache.quotes = allQuotes;
+            }
+            cache.fetchedAt = Date.now();
+            chrome.storage.local.set({ [QUOTE_CACHE_KEY]: cache });
+            if (callback) callback();
+          });
         }
 
-        function showFromPool() {
-          if (cache.pool.length > 0) {
-            var q = cache.pool.shift();
+        function showQuote() {
+          if (cache.quotes.length > 0) {
+            var q = pickRandom(cache.quotes);
             var text = q.text || "Stay focused.";
             var author = q.author ? " — " + q.author : "";
             document.getElementById("quoteText").textContent = text + author;
-            chrome.storage.local.set({ [QUOTE_CACHE_KEY]: cache });
           } else {
             showLocalQuote();
           }
         }
 
-        if (cache.pool.length < CACHE_REFILL_AT) {
-          fetchAndRefill(showFromPool);
+        if (!sameDay(cache.fetchedAt, Date.now())) {
+          fetchFresh(showQuote);
+        } else if (cache.quotes.length > 0) {
+          showQuote();
         } else {
-          showFromPool();
+          showLocalQuote();
         }
       });
     } else {

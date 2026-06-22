@@ -17,10 +17,16 @@ declare global {
   const defineWxtPlugin: typeof import('wxt/utils/define-wxt-plugin').defineWxtPlugin
   const fakeBrowser: typeof import('wxt/testing').fakeBrowser
   const getAppConfig: typeof import('wxt/utils/app-config').getAppConfig
+  const getDefaultBlockStats: typeof import('/Users/virali/git/ts/src/utils/defaults').getDefaultBlockStats
   const getDefaults: typeof import('/Users/virali/git/ts/src/utils/defaults').getDefaults
+  const incrementBlockStats: typeof import('/Users/virali/git/ts/src/utils/stats').incrementBlockStats
   const injectScript: typeof import('wxt/utils/inject-script').injectScript
   const isUrlBlocked: typeof import('/Users/virali/git/ts/src/utils/matcher').isUrlBlocked
+  const loadBlockStats: typeof import('/Users/virali/git/ts/src/utils/stats').loadBlockStats
   const loadData: typeof import('/Users/virali/git/ts/src/utils/storage').loadData
+  const patternsToDNRRules: typeof import('/Users/virali/git/ts/src/utils/matcher').patternsToDNRRules
+  const resetBlockStats: typeof import('/Users/virali/git/ts/src/utils/stats').resetBlockStats
+  const saveBlockStats: typeof import('/Users/virali/git/ts/src/utils/stats').saveBlockStats
   const saveData: typeof import('/Users/virali/git/ts/src/utils/storage').saveData
   const storage: typeof import('wxt/utils/storage').storage
   const useAppConfig: typeof import('wxt/utils/app-config').useAppConfig

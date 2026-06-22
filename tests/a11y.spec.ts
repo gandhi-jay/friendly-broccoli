@@ -46,6 +46,7 @@ async function setStorageTheme(page: Page, theme: string): Promise<void> {
           data.youtubeVideoIds = ["dQw4w9WgXcQ"];
         if (!Array.isArray(data.quotes)) data.quotes = ["Stay focused."];
         data.disableApiQuotes = true;
+        data.blockNetworkRequests = false;
         chrome.storage.sync.set({ extensionData: data }, () => resolve());
       });
     });

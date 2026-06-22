@@ -7,17 +7,37 @@ interface Props {
 }
 
 export default function BlocklistTab({ data, onUpdate }: Props) {
-  const [text, setText] = useState(data.blocklist.join("\n"));
-  const [saved, setSaved] = useState(false);
+  const [input, setInput] = useState("");
 
-  const handleSave = async () => {
-    const patterns = text
-      .split("\n")
-      .map((l) => l.trim())
-      .filter(Boolean);
-    await onUpdate({ blocklist: patterns });
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  const addPattern = async () => {
+    const p = input.trim();
+    if (!p) return;
+    await onUpdate({
+      blocklist: [...data.blocklist, { pattern: p, blockNetwork: false }],
+    });
+    setInput("");
+  };
+
+  const removePattern = async (index: number) => {
+    await onUpdate({
+      blocklist: data.blocklist.filter((_, i) => i !== index),
+    });
+  };
+
+  const updatePattern = async (index: number, pattern: string) => {
+    const entry = data.blocklist[index];
+    if (!entry) return;
+    const next = [...data.blocklist];
+    next[index] = { pattern, blockNetwork: entry.blockNetwork };
+    await onUpdate({ blocklist: next });
+  };
+
+  const toggleNetwork = async (index: number) => {
+    const entry = data.blocklist[index];
+    if (!entry) return;
+    const next = [...data.blocklist];
+    next[index] = { pattern: entry.pattern, blockNetwork: !entry.blockNetwork };
+    await onUpdate({ blocklist: next });
   };
 
   return (
@@ -29,24 +49,62 @@ export default function BlocklistTab({ data, onUpdate }: Props) {
         <code className="text-accent code-bg px-1 rounded">facebook.com</code>,{" "}
         <code className="text-accent code-bg px-1 rounded">face*.*</code>
       </p>
-      <textarea
-        className="w-full h-64 bg-surface border-border rounded-lg p-4 text-sm font-mono text-primary focus:border-accent focus:ring-accent resize-y"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        placeholder="Enter patterns, one per line..."
-      />
-      <div className="flex items-center gap-3 mt-3">
+
+      <div className="flex gap-2 mb-4">
+        <input
+          className="flex-1 bg-surface border-border rounded-lg px-4 py-2 text-sm text-primary focus:border-accent focus:ring-accent"
+          placeholder="Add a new pattern..."
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && addPattern()}
+        />
         <button
-          onClick={handleSave}
-          className="px-5 py-2 bg-btn-bg hover:bg-btn-bg rounded-lg text-sm font-medium transition-colors text-primary ring-1 ring-accent"
+          onClick={addPattern}
+          className="px-4 py-2 bg-btn-bg hover:bg-btn-bg rounded-lg text-sm font-medium transition-colors text-primary ring-1 ring-accent"
         >
-          Save Blocklist
+          Add
         </button>
-        {saved && <span className="text-accent text-sm">Saved!</span>}
-        <span className="text-secondary text-sm ml-auto">
-          {data.blocklist.length} pattern{data.blocklist.length !== 1 ? "s" : ""}
-        </span>
       </div>
+
+      {data.blocklist.length === 0 ? (
+        <p className="text-secondary text-sm text-center py-8">No patterns yet.</p>
+      ) : (
+        <ul className="space-y-2">
+          {data.blocklist.map((entry, i) => (
+            <li
+              key={i}
+              className="flex items-start gap-2 bg-surface rounded-lg px-4 py-3"
+            >
+              <input
+                className="flex-1 bg-transparent border-b border-transparent hover:border-border focus:border-accent text-sm text-primary outline-none py-1 transition-colors font-mono"
+                value={entry.pattern}
+                onChange={(e) => updatePattern(i, e.target.value)}
+              />
+              <label className="flex items-center gap-1.5 shrink-0 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={entry.blockNetwork}
+                  onChange={() => toggleNetwork(i)}
+                  className="w-3.5 h-3.5 rounded border-border bg-surface text-accent focus:ring-accent"
+                />
+                <span className="text-xs text-secondary whitespace-nowrap">Block net</span>
+              </label>
+              <button
+                onClick={() => removePattern(i)}
+                className="text-err hover:text-err text-sm font-medium shrink-0"
+              >
+                ✕
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <p className="text-secondary text-sm mt-4">
+        {data.blocklist.length} pattern{data.blocklist.length !== 1 ? "s" : ""}
+        {" — "}
+        {data.blocklist.filter((e) => e.blockNetwork).length} with network blocking
+      </p>
     </div>
   );
 }

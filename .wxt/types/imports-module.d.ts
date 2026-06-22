@@ -18,7 +18,8 @@ declare module '#imports' {
   export { InvalidMatchPattern, MatchPattern } from 'wxt/utils/match-patterns';
   export { useState, useCallback, useMemo, useEffect, useRef, useContext, useReducer } from 'react';
   export { fakeBrowser } from 'wxt/testing';
-  export { defaultYoutubeVideoIds, defaultQuotes, getDefaults } from '../src/utils/defaults';
-  export { isUrlBlocked } from '../src/utils/matcher';
+  export { defaultYoutubeVideoIds, defaultQuotes, getDefaults, getDefaultBlockStats } from '../src/utils/defaults';
+  export { isUrlBlocked, patternsToDNRRules } from '../src/utils/matcher';
+  export { loadBlockStats, saveBlockStats, incrementBlockStats, resetBlockStats } from '../src/utils/stats';
   export { loadData, saveData } from '../src/utils/storage';
 }

@@ -1,11 +1,8 @@
-import type { ExtensionData } from "../types";
+import type { ExtensionData, BlockStats } from "../types";
 
 export const defaultYoutubeVideoIds: string[] = [
-  "dQw4w9WgXcQ",
-  "jNQXAC9IVRw",
-  "kJQP7kiw5Fk",
-  "JGwWNGJdvx8",
-  "RgKAFK5djSk",
+  "HJJaMENwZ1I",
+  "kD3-DKkiVeA"
 ];
 
 export const defaultQuotes: string[] = [
@@ -33,5 +30,19 @@ export function getDefaults(): ExtensionData {
     quotes: defaultQuotes,
     theme: "terminal",
     disableApiQuotes: false,
+  };
+}
+
+export function getDefaultBlockStats(): BlockStats {
+  const now = new Date();
+  return {
+    totalNavigations: 0,
+    totalNetworkBlocks: 0,
+    lastBlockedUrl: null,
+    lastBlockedDate: null,
+    todayNavigations: 0,
+    todayNetworkBlocks: 0,
+    todayDate: now.toISOString().slice(0, 10),
+    perPattern: {},
   };
 }

@@ -1,18 +1,21 @@
 import { useState, useEffect, useCallback } from "react";
 import type { ExtensionData } from "../../types";
 import { getDefaults } from "../../utils/defaults";
+import { loadData, saveData } from "../../utils/storage";
 import BlocklistTab from "./BlocklistTab";
 import VideosTab from "./VideosTab";
 import QuotesTab from "./QuotesTab";
 import ThemeTab from "./ThemeTab";
+import StatsTab from "./StatsTab";
 
-type Tab = "blocklist" | "videos" | "quotes" | "theme";
+type Tab = "blocklist" | "videos" | "quotes" | "theme" | "stats";
 
 const tabs: { id: Tab; label: string }[] = [
   { id: "blocklist", label: "Blocklist" },
   { id: "videos", label: "YouTube Videos" },
   { id: "quotes", label: "Quotes" },
   { id: "theme", label: "Theme" },
+  { id: "stats", label: "Stats" },
 ];
 
 export default function App() {
@@ -21,8 +24,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    chrome.storage.sync.get("extensionData", (result) => {
-      const d = (result.extensionData as ExtensionData) ?? getDefaults();
+    loadData().then((d) => {
       setData(d);
       document.documentElement.setAttribute("data-theme", d.theme);
       setLoading(false);
@@ -34,7 +36,7 @@ export default function App() {
       if (!data) return;
       const next: ExtensionData = { ...data, ...partial };
       setData(next);
-      await chrome.storage.sync.set({ extensionData: next });
+      await saveData(next);
       if (partial.theme) {
         document.documentElement.setAttribute("data-theme", next.theme);
       }
@@ -87,6 +89,7 @@ export default function App() {
           onSelect={(theme) => updateData({ theme })}
         />
       )}
+      {activeTab === "stats" && <StatsTab />}
     </main>
   );
 }
