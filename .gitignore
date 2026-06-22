@@ -1,0 +1,4 @@
+node_modules
+.output
+chrome-mv3
+.tmp

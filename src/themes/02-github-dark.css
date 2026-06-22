@@ -1,0 +1,31 @@
+[data-theme="github-dark"] {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --primary: #e6edf3;
+  --secondary: #8b949e;
+  --accent: #58a6ff;
+  --accent2: #3fb950;
+  --border: #30363d;
+  --code-bg: #151b23;
+  --selection: #264f78;
+  --btn-bg: #21262d;
+  --btn-text: #c9d1d9;
+  --tag-bg: #1c1e26;
+  --tag-text: #58a6ff;
+  --input-bg: #0d1117;
+  --overlay: rgba(0, 0, 0, 0.7);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --syntax-comment: #8b949e;
+  --syntax-keyword: #ff7b72;
+  --syntax-function: #d2a8ff;
+  --syntax-builtin: #d2a8ff;
+  --syntax-constant: #79c0ff;
+  --syntax-decorator: #ffa657;
+  --syntax-attr: #79c0ff;
+  --syntax-variable: #e6edf3;
+  --syntax-type: #ffa657;
+  --syntax-str: #a5d6ff;
+  --syntax-num: #d2a8ff;
+  --syntax-err: #ff6b6b;
+  --syntax-ins: #3fb950;
+}
