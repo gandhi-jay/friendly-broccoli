@@ -9,7 +9,11 @@
     "zip": "wxt zip",
     "compile": "wxt build",
     "deploy-embed": "bash scripts/deploy-embed.sh",
-    "test:a11y": "wxt build && vitest run tests/a11y.spec.ts"
+    "test": "pnpm build && vitest run tests/",
+    "test:unit": "vitest run tests/unit/",
+    "test:e2e": "pnpm build && vitest run tests/e2e/",
+    "test:a11y": "pnpm build && vitest run tests/a11y.spec.ts",
+    "test:update-snapshots": "pnpm build && vitest run tests/ --update"
   },
   "devEngines": {
     "packageManager": {

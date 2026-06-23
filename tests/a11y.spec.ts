@@ -1,11 +1,22 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { chromium, type BrowserContext, type Page } from "playwright";
+import { execSync } from "child_process";
 import { AxeBuilder } from "@axe-core/playwright";
 import path from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const EXTENSION_PATH = path.resolve(__dirname, "../chrome-mv3");
+
+async function closeContext(context: BrowserContext, userDataDir: string): Promise<void> {
+  await context.close();
+  try {
+    execSync(
+      `ps aux | grep -F '${userDataDir}' | grep -v grep | awk '{print $2}' | xargs -r kill -9 2>/dev/null || true`,
+      { shell: true },
+    );
+  } catch {}
+}
 
 const themes = [
   "terminal",
@@ -42,11 +53,13 @@ async function setStorageTheme(page: Page, theme: string): Promise<void> {
         const data = result.extensionData || {};
         data.theme = t;
         if (!Array.isArray(data.blocklist)) data.blocklist = [];
+        data.blocklist = data.blocklist.map((p: any) =>
+          typeof p === "string" ? { pattern: p, blockNetwork: false } : p,
+        );
         if (!Array.isArray(data.youtubeVideoIds))
           data.youtubeVideoIds = ["dQw4w9WgXcQ"];
         if (!Array.isArray(data.quotes)) data.quotes = ["Stay focused."];
         data.disableApiQuotes = true;
-        data.blockNetworkRequests = false;
         chrome.storage.sync.set({ extensionData: data }, () => resolve());
       });
     });
@@ -69,14 +82,15 @@ function printViolations(label: string, results: { violations: any[] }) {
 describe("Accessibility", () => {
   let context: BrowserContext;
   let extensionId: string;
+  let axeUserDataDir: string;
 
   beforeAll(async () => {
-    const userDataDir = path.resolve(
+    axeUserDataDir = path.resolve(
       __dirname,
       "../.tmp/axe-test-user-data-dir",
     );
 
-    context = await chromium.launchPersistentContext(userDataDir, {
+    context = await chromium.launchPersistentContext(axeUserDataDir, {
       headless: false,
       args: [
         `--disable-extensions-except=${EXTENSION_PATH}`,
@@ -89,7 +103,7 @@ describe("Accessibility", () => {
   });
 
   afterAll(async () => {
-    await context.close();
+    await closeContext(context, axeUserDataDir);
   });
 
   describe.each(themes)("theme: %s", (theme) => {

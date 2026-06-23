@@ -1,0 +1,137 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`isUrlBlocked > snapshot — isUrlBlocked output for multiple patterns 1`] = `
+[
+  {
+    "blocked": true,
+    "pattern": "*.reddit.com",
+  },
+  {
+    "blocked": true,
+    "pattern": "facebook.com",
+  },
+  {
+    "blocked": true,
+    "pattern": "*tube*",
+  },
+  {
+    "blocked": false,
+    "pattern": null,
+  },
+  {
+    "blocked": false,
+    "pattern": null,
+  },
+]
+`;
+
+exports[`patternsToDNRRules > snapshot — full rules output for mixed entries 1`] = `
+[
+  {
+    "action": {
+      "type": "block",
+    },
+    "condition": {
+      "requestDomains": [
+        "reddit.com",
+      ],
+      "resourceTypes": [
+        "sub_frame",
+        "stylesheet",
+        "script",
+        "image",
+        "font",
+        "object",
+        "xmlhttprequest",
+        "ping",
+        "media",
+        "websocket",
+        "webtransport",
+        "webbundle",
+        "other",
+      ],
+    },
+    "id": 100,
+    "priority": 1,
+  },
+  {
+    "action": {
+      "type": "block",
+    },
+    "condition": {
+      "requestDomains": [
+        ".facebook.com",
+      ],
+      "resourceTypes": [
+        "sub_frame",
+        "stylesheet",
+        "script",
+        "image",
+        "font",
+        "object",
+        "xmlhttprequest",
+        "ping",
+        "media",
+        "websocket",
+        "webtransport",
+        "webbundle",
+        "other",
+      ],
+    },
+    "id": 101,
+    "priority": 1,
+  },
+  {
+    "action": {
+      "type": "block",
+    },
+    "condition": {
+      "isUrlFilterCaseSensitive": false,
+      "regexFilter": "^https?://[^/]*.*tube.*",
+      "resourceTypes": [
+        "sub_frame",
+        "stylesheet",
+        "script",
+        "image",
+        "font",
+        "object",
+        "xmlhttprequest",
+        "ping",
+        "media",
+        "websocket",
+        "webtransport",
+        "webbundle",
+        "other",
+      ],
+    },
+    "id": 102,
+    "priority": 1,
+  },
+  {
+    "action": {
+      "type": "block",
+    },
+    "condition": {
+      "isUrlFilterCaseSensitive": false,
+      "regexFilter": "^https?://[^/]*face.*book.*",
+      "resourceTypes": [
+        "sub_frame",
+        "stylesheet",
+        "script",
+        "image",
+        "font",
+        "object",
+        "xmlhttprequest",
+        "ping",
+        "media",
+        "websocket",
+        "webtransport",
+        "webbundle",
+        "other",
+      ],
+    },
+    "id": 103,
+    "priority": 1,
+  },
+]
+`;

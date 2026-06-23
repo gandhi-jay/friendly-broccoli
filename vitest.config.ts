@@ -5,5 +5,6 @@ export default defineConfig({
     globals: true,
     testTimeout: 60000,
     hookTimeout: 30000,
+    teardownTimeout: 15000,
   },
 });
