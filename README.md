@@ -5,8 +5,8 @@
 </p>
 
 A Chrome extension that blocks distracting websites and replaces them with a
-soothing blocked page featuring a YouTube video, a motivational quote, and an
-animated particle background.
+soothing blocked page featuring a YouTube video, a motivational quote, and a
+Three.js-powered 3D particle animation.
 
 ## Features
 
@@ -14,17 +14,19 @@ animated particle background.
 - **Per-pattern network blocking** — independently toggle `declarativeNetRequest`
   blocking for each pattern in your blocklist
 - **Blocked page** — shows a random YouTube video, motivational quote, and
-  canvas particles that react to cursor movement
+  Three.js 3D particles that react to cursor movement
 - **Themes** — 5 built-in themes (Terminal, GitHub Dark, Dracula, Catppuccin
   Mocha, Solarized Light)
-- **Online quote API** — optional LRU-cached quotes from
-  `type.fit/api/quotes` with local fallback
+- **Online quote API** — optional daily-cached quotes from
+  `type.fit/api/quotes` and `zenquotes.io` with local fallback
 - **Blocked request stats** — tracks navigation and network request blocks per
   pattern; view totals, today's counts, and per-pattern breakdown in the Stats tab
 - **Editable lists** — customize your video IDs, quotes, and blocklist
 - **In-memory cache** — blocklist is cached in the service worker for instant
   redirects (no storage read on each navigation)
-- **Accessible** — 10 axe-core tests across all 5 themes, WCAG AA compliant
+- **Accessible** — axe-core accessibility tests across all 5 themes, WCAG AA compliant
+- **Comprehensive tests** — accessibility, E2E, and unit test suites with
+  visual snapshot testing
 
 ## Installation
 
@@ -63,7 +65,7 @@ showing:
 - The URL that was blocked
 - A random YouTube video (embedded via a hosted bridge page)
 - A motivational quote (from the API or local list)
-- An animated particle canvas that reacts to cursor movement
+- A Three.js 3D particle animation that reacts to cursor movement
 
 ### Blocklist Patterns
 
@@ -127,7 +129,7 @@ accepts the embed.
 
 All themes are pure CSS custom properties. The `data-theme` attribute on
 `<html>` controls which theme is active. Both the options page (React/Tailwind)
-and the blocked page (vanilla JS/inline CSS) respect the same theme.
+and the blocked page (TypeScript/inline CSS) respect the same theme.
 
 | Theme | ID | Style |
 |---|---|---|
@@ -137,31 +139,49 @@ and the blocked page (vanilla JS/inline CSS) respect the same theme.
 | Catppuccin Mocha | `catppuccin-mocha` | Warm dark, lavender accents |
 | Solarized Light | `solarized-light` | Light, teal/blue accents |
 
-## Accessibility
+## Testing
 
-All 5 themes pass WCAG AA on both the options page and the blocked page.
-Automated testing uses `@axe-core/playwright` with Vitest.
+Three test suites powered by Vitest and Playwright:
 
-**Known issue**: The YouTube player iframe (inside the bridge page) triggers
-`frame-title` and `aria-prohibited-attr` axe violations. These rules are
-disabled for the blocked page, as the violations originate from YouTube's own
-player code and cannot be fixed by the extension.
+| Suite | Command | Description |
+|---|---|---|
+| Accessibility | `pnpm test:a11y` | axe-core WCAG AA checks across all 5 themes on both pages |
+| E2E | `pnpm test:e2e` | Full extension tests (blocking flow, blocklist UI, stats UI, network blocking, visual snapshots) |
+| Unit | `pnpm test:unit` | Isolated unit tests for matcher, stats, and storage utilities |
+| All | `pnpm test` | Build + run all test suites |
 
 ```bash
-pnpm test:a11y
+pnpm test                 # Build + run all tests
+pnpm test:unit            # Unit tests only (no build needed)
+pnpm test:e2e             # Build + E2E tests
+pnpm test:a11y            # Build + axe-core accessibility tests
+pnpm test:update-snapshots # Update visual and DOM snapshots
 ```
 
-Runs `wxt build && vitest run tests/a11y.spec.ts` — 10 tests (5 themes × 2
-pages).
+**Accessibility**: All 5 themes pass WCAG AA on both pages. Known issue: the
+YouTube player iframe triggers `frame-title` and `aria-prohibited-attr` axe
+violations — these rules are disabled for the blocked page as they originate
+from YouTube's own player code.
+
+**E2E**: Launches a headless Chrome instance with the built extension, tests
+navigation blocking, network request blocking via DNR, options UI interaction,
+and takes visual snapshots of the blocked page (compared against stored
+baselines).
+
+**Unit**: Tests URL matching (substring, glob, edge cases), DNR rule generation,
+block stats CRUD, and storage migration logic.
 
 ## Development
 
 ```bash
-pnpm dev            # WXT dev server with hot reload
-pnpm build          # Production build
-pnpm test:a11y      # Build + axe-core accessibility tests
-pnpm zip            # Package for Chrome Web Store
-pnpm deploy-embed   # Push yt-embed.html to GitHub Pages
+pnpm dev                   # WXT dev server with hot reload
+pnpm build                 # Production build
+pnpm test                  # Build + run all tests
+pnpm test:unit             # Unit tests only
+pnpm test:e2e              # Build + E2E tests
+pnpm test:a11y             # Build + axe-core accessibility tests
+pnpm zip                   # Package for Chrome Web Store
+pnpm deploy-embed          # Push yt-embed.html to GitHub Pages
 ```
 
 ### Project Structure
@@ -174,6 +194,8 @@ friendly-broccoli/
 ├── src/
 │   ├── entrypoints/
 │   │   ├── background.ts     # Service worker (navigation + DNR + stats)
+│   │   ├── blocked/
+│   │   │   └── main.ts       # Blocked page: theme, video, quote, Three.js particles
 │   │   └── options/          # React options page (5 tabs: Blocklist, Videos, Quotes, Theme, Stats)
 │   │       ├── App.tsx           # Main app with tab routing
 │   │       ├── BlocklistTab.tsx  # Per-pattern list with network toggle
@@ -182,9 +204,7 @@ friendly-broccoli/
 │   │       ├── ThemeTab.tsx      # Theme picker
 │   │       └── StatsTab.tsx      # Blocked request statistics
 │   ├── public/
-│   │   ├── blocked.html      # Blocked page HTML shell
-│   │   ├── blocked.js        # Theme, video, quote, particle init
-│   │   └── particles.js      # Canvas particle system
+│   │   └── blocked.html      # Blocked page HTML shell
 │   ├── themes/               # 5 CSS theme files + Tailwind overrides
 │   ├── types/                # ExtensionData, BlocklistEntry, BlockStats
 │   └── utils/
@@ -193,7 +213,20 @@ friendly-broccoli/
 │       ├── defaults.ts       # Default settings + default BlockStats
 │       └── stats.ts          # BlockStats CRUD via chrome.storage.local
 ├── tests/
-│   └── a11y.spec.ts          # WCAG compliance tests
+│   ├── a11y.spec.ts          # WCAG accessibility tests
+│   ├── e2e/                  # E2E tests (blocking, UI, visual snapshots)
+│   │   ├── blocking.test.ts
+│   │   ├── blocklist-ui.test.ts
+│   │   ├── network-block.test.ts
+│   │   ├── stats-ui.test.ts
+│   │   ├── visual-snapshots.test.ts
+│   │   ├── setup.ts
+│   │   └── __snapshots__/
+│   └── unit/                 # Unit tests (matcher, stats, storage)
+│       ├── matcher.test.ts
+│       ├── stats.test.ts
+│       ├── storage.test.ts
+│       └── __snapshots__/
 ├── wxt.config.ts             # WXT build config
 ├── vitest.config.ts          # Vitest config
 └── friendly-brocolli.png     # Logo
@@ -220,10 +253,10 @@ isUrlBlocked() → matches pattern?
 Redirect to    Let navigation
 blocked.html   proceed normally
    │
-   ├── blocked.js loads theme, video, quote
-   ├── particles.js renders canvas
-   ├── If quote API enabled: LRU cache management
-   └── incrementBlockStats("navigation", url, pattern)
+    ├── blocked/main.ts loads theme, video, quote
+    ├── Three.js 3D particle renderer
+    ├── If quote API enabled: daily cache management
+    └── incrementBlockStats("navigation", url, pattern)
               │
               ▼
        chrome.storage.local
@@ -232,9 +265,13 @@ blocked.html   proceed normally
 
 Per-pattern `declarativeNetRequest` rules are created only for entries with
 "Block net" enabled. These block subresource requests (`fetch`, `XHR`, `<img>`,
-`<script>`, `<iframe>`, etc.) at the network level. Blocked subresource
-requests are counted via `chrome.webRequest.onErrorOccurred` filtering for
-`ERR_BLOCKED_BY_CLIENT`.
+`<script>`, `<iframe>`, etc.) at the network level. Rules are regenerated
+on any `chrome.storage.onChanged` event so the DNR rule set is always in sync.
+
+Blocked subresource requests are counted via
+`chrome.webRequest.onErrorOccurred` filtering for `ERR_BLOCKED_BY_CLIENT`.
+Both navigation and network blocks are persisted to `chrome.storage.local`
+with per-pattern breakdowns.
 
 The blocklist is cached in memory in the service worker (`getData()`), so
 navigation redirects are instant — no `chrome.storage.sync` read on each page
