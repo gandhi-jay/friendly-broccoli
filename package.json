@@ -1,6 +1,6 @@
 {
   "name": "friendly-broccoli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Chrome extension to block distracting websites",
   "type": "module",
   "scripts": {
@@ -26,6 +26,7 @@
     "@axe-core/playwright": "^4.11.3",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@types/three": "^0.184.1",
     "@wxt-dev/module-react": "^1.0.0",
     "autoprefixer": "^10.4.0",
     "playwright": "^1.61.0",
@@ -37,6 +38,7 @@
   },
   "dependencies": {
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "three": "^0.184.0"
   }
 }
