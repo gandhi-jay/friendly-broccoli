@@ -207,9 +207,9 @@ const vertexShader = `
   varying float vAlpha;
   void main() {
     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-    gl_PointSize = size * (300.0 / -mvPosition.z);
+    gl_PointSize = size * (400.0 / -mvPosition.z);
     gl_Position = projectionMatrix * mvPosition;
-    vAlpha = 0.5 + 0.5 * (1.0 - clamp(-mvPosition.z / 600.0, 0.0, 1.0));
+    vAlpha = 0.8 + 0.2 * (1.0 - clamp(-mvPosition.z / 600.0, 0.0, 1.0));
   }
 `;
 const fragmentShader = `
@@ -218,7 +218,7 @@ const fragmentShader = `
   void main() {
     float d = distance(gl_PointCoord, vec2(0.5));
     if (d > 0.5) discard;
-    float alpha = smoothstep(0.5, 0.0, d) * vAlpha * 0.85;
+    float alpha = smoothstep(0.5, 0.0, d) * vAlpha;
     gl_FragColor = vec4(uColor, alpha);
   }
 `;
@@ -249,7 +249,7 @@ lineGeometry.setDrawRange(0, 0);
 const lineMaterial = new THREE.LineBasicMaterial({
   color: getAccentColor(),
   transparent: true,
-  opacity: 0.12,
+  opacity: 0.25,
   blending: THREE.AdditiveBlending,
   depthWrite: false,
 });
@@ -284,11 +284,12 @@ function handleResize() {
 window.addEventListener("resize", handleResize);
 
 // ---- Animation ----
-let clock = new THREE.Clock();
+let clock = new THREE.Timer();
 
 function animate() {
+  clock.update();
   const dt = clock.getDelta();
-  const elapsed = clock.getElapsedTime();
+  const elapsed = clock.getElapsed();
 
   // Project mouse to z=0 plane in world space
   if (mouseActive) {

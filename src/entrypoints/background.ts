@@ -68,20 +68,27 @@ export default defineBackground({
       }
     });
 
-    chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
-      if (details.frameId !== 0) return;
-
-      const url = details.url;
+    async function handleNavigation(url: string, tabId: number): Promise<void> {
       if (!url || url.startsWith("chrome-extension://") || url.startsWith("chrome://")) return;
 
       const data = await getData();
       const result = isUrlBlocked(url, data.blocklist);
       if (result.blocked) {
         const blockedUrl = chrome.runtime.getURL("blocked.html") + "?url=" + encodeURIComponent(url);
-        chrome.tabs.update(details.tabId, { url: blockedUrl });
+        chrome.tabs.update(tabId, { url: blockedUrl });
 
         await incrementBlockStats("navigation", url, result.pattern!);
       }
+    }
+
+    chrome.webNavigation.onBeforeNavigate.addListener((details) => {
+      if (details.frameId !== 0) return;
+      handleNavigation(details.url, details.tabId);
+    });
+
+    chrome.webNavigation.onCommitted.addListener((details) => {
+      if (details.frameId !== 0) return;
+      handleNavigation(details.url, details.tabId);
     });
 
     chrome.webRequest.onErrorOccurred.addListener(

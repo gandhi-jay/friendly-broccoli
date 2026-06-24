@@ -1,202 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stay Focused</title>
-<style>
-:root {
-  --bg: #0d0f14;
-  --surface: #12161f;
-  --primary: #e6edf3;
-  --secondary: #a0aab4;
-  --accent: #7ecf7e;
-  --accent2: #58a6ff;
-  --border: #20252e;
-  --code-bg: #0e121b;
-  --selection: #003b1f;
-  --btn-bg: #1a1f28;
-  --btn-text: #c9d1d9;
-  --tag-bg: #0e121b;
-  --tag-text: #7ecf7e;
-  --input-bg: #0d0f14;
-  --overlay: rgba(0, 0, 0, 0.7);
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --radius: 6px;
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
-  --font-sans: 'Lato', 'Helvetica Neue', 'Arial', sans-serif;
-}
-[data-theme="terminal"] {
-  --bg: #0d0f14;
-  --surface: #12161f;
-  --primary: #e6edf3;
-  --secondary: #a0aab4;
-  --accent: #7ecf7e;
-  --accent2: #58a6ff;
-  --border: #20252e;
-  --code-bg: #0e121b;
-  --selection: #003b1f;
-  --btn-bg: #1a1f28;
-  --btn-text: #c9d1d9;
-  --tag-bg: #0e121b;
-  --tag-text: #7ecf7e;
-  --input-bg: #0d0f14;
-  --overlay: rgba(0, 0, 0, 0.7);
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-[data-theme="github-dark"] {
-  --bg: #0d1117;
-  --surface: #161b22;
-  --primary: #e6edf3;
-  --secondary: #8b949e;
-  --accent: #58a6ff;
-  --accent2: #3fb950;
-  --border: #30363d;
-  --code-bg: #151b23;
-  --selection: #264f78;
-  --btn-bg: #21262d;
-  --btn-text: #c9d1d9;
-  --tag-bg: #1c1e26;
-  --tag-text: #58a6ff;
-  --input-bg: #0d1117;
-  --overlay: rgba(0, 0, 0, 0.7);
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-}
-[data-theme="dracula"] {
-  --bg: #282a36;
-  --surface: #44475a;
-  --primary: #f8f8f2;
-  --secondary: #d8d8d2;
-  --accent: #bd93f9;
-  --accent2: #50fa7b;
-  --border: #44475a;
-  --code-bg: #21222c;
-  --selection: #44475a;
-  --btn-bg: #44475a;
-  --btn-text: #f8f8f2;
-  --tag-bg: #44475a;
-  --tag-text: #bd93f9;
-  --input-bg: #21222c;
-  --overlay: rgba(0, 0, 0, 0.7);
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-[data-theme="catppuccin-mocha"] {
-  --bg: #1e1e2e;
-  --surface: #313244;
-  --primary: #cdd6f4;
-  --secondary: #a6adc8;
-  --accent: #89b4fa;
-  --accent2: #a6e3a1;
-  --border: #45475a;
-  --code-bg: #181825;
-  --selection: #585b70;
-  --btn-bg: #313244;
-  --btn-text: #cdd6f4;
-  --tag-bg: #313244;
-  --tag-text: #89b4fa;
-  --input-bg: #1e1e2e;
-  --overlay: rgba(0, 0, 0, 0.6);
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-[data-theme="solarized-light"] {
-  --bg: #fdf6e3;
-  --surface: #eee8d5;
-  --primary: #496269;
-  --secondary: #4a5b62;
-  --accent: #006ba3;
-  --accent2: #859900;
-  --border: #93a1a1;
-  --code-bg: #f0ead8;
-  --selection: #d33682;
-  --btn-bg: #eee8d5;
-  --btn-text: #496269;
-  --tag-bg: #eee8d5;
-  --tag-text: #006ba3;
-  --input-bg: #fdf6e3;
-  --overlay: rgba(0, 0, 0, 0.15);
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  font-family: var(--font-sans);
-  background: var(--bg);
-  color: var(--primary);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  position: relative;
-}
-#particles-container {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  z-index: 0;
-  pointer-events: none;
-}
-.container {
-  width: 100%;
-  max-width: 720px;
-  text-align: center;
-  position: relative;
-  z-index: 1;
-}
-.video-wrapper {
-  position: relative;
-  width: 100%;
-  padding-bottom: 56.25%;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-}
-.video-wrapper iframe {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  border: 0;
-}
-.quote-card {
-  margin-top: 2rem;
-  padding: 1.5rem 2rem;
-  background: var(--surface);
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  backdrop-filter: blur(10px);
-}
-.quote-text {
-  font-size: 1.25rem;
-  line-height: 1.6;
-  font-style: italic;
-  color: var(--primary);
-}
-.blocked-url {
-  margin-top: 1rem;
-  font-size: 0.8rem;
-  color: var(--secondary);
-  opacity: 0.7;
-}
-.loading { opacity: 0.6; }
-@media (max-width: 480px) {
-  .quote-text { font-size: 1rem; }
-  body { padding: 1rem; }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stay Focused</title>
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --surface: #12161f;
+      --primary: #e6edf3;
+      --secondary: #a0aab4;
+      --accent: #7ecf7e;
+      --accent2: #58a6ff;
+      --border: #20252e;
+      --code-bg: #0e121b;
+      --selection: #003b1f;
+      --btn-bg: #1a1f28;
+      --btn-text: #c9d1d9;
+      --tag-bg: #0e121b;
+      --tag-text: #7ecf7e;
+      --input-bg: #0d0f14;
+      --overlay: rgba(0, 0, 0, 0.7);
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      --radius: 6px;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+      --font-sans: 'Lato', 'Helvetica Neue', 'Arial', sans-serif;
+    }
+
+    [data-theme="terminal"] {
+      --bg: #0d0f14;
+      --surface: #12161f;
+      --primary: #e6edf3;
+      --secondary: #a0aab4;
+      --accent: #7ecf7e;
+      --accent2: #58a6ff;
+      --border: #20252e;
+      --code-bg: #0e121b;
+      --selection: #003b1f;
+      --btn-bg: #1a1f28;
+      --btn-text: #c9d1d9;
+      --tag-bg: #0e121b;
+      --tag-text: #7ecf7e;
+      --input-bg: #0d0f14;
+      --overlay: rgba(0, 0, 0, 0.7);
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    [data-theme="github-dark"] {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --primary: #e6edf3;
+      --secondary: #8b949e;
+      --accent: #58a6ff;
+      --accent2: #3fb950;
+      --border: #30363d;
+      --code-bg: #151b23;
+      --selection: #264f78;
+      --btn-bg: #21262d;
+      --btn-text: #c9d1d9;
+      --tag-bg: #1c1e26;
+      --tag-text: #58a6ff;
+      --input-bg: #0d1117;
+      --overlay: rgba(0, 0, 0, 0.7);
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    }
+
+    [data-theme="dracula"] {
+      --bg: #282a36;
+      --surface: #44475a;
+      --primary: #f8f8f2;
+      --secondary: #d8d8d2;
+      --accent: #bd93f9;
+      --accent2: #50fa7b;
+      --border: #44475a;
+      --code-bg: #21222c;
+      --selection: #44475a;
+      --btn-bg: #44475a;
+      --btn-text: #f8f8f2;
+      --tag-bg: #44475a;
+      --tag-text: #bd93f9;
+      --input-bg: #21222c;
+      --overlay: rgba(0, 0, 0, 0.7);
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    [data-theme="catppuccin-mocha"] {
+      --bg: #1e1e2e;
+      --surface: #313244;
+      --primary: #cdd6f4;
+      --secondary: #a6adc8;
+      --accent: #89b4fa;
+      --accent2: #a6e3a1;
+      --border: #45475a;
+      --code-bg: #181825;
+      --selection: #585b70;
+      --btn-bg: #313244;
+      --btn-text: #cdd6f4;
+      --tag-bg: #313244;
+      --tag-text: #89b4fa;
+      --input-bg: #1e1e2e;
+      --overlay: rgba(0, 0, 0, 0.6);
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    [data-theme="solarized-light"] {
+      --bg: #fdf6e3;
+      --surface: #eee8d5;
+      --primary: #496269;
+      --secondary: #4a5b62;
+      --accent: #006ba3;
+      --accent2: #859900;
+      --border: #93a1a1;
+      --code-bg: #f0ead8;
+      --selection: #d33682;
+      --btn-bg: #eee8d5;
+      --btn-text: #496269;
+      --tag-bg: #eee8d5;
+      --tag-text: #006ba3;
+      --input-bg: #fdf6e3;
+      --overlay: rgba(0, 0, 0, 0.15);
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+    }
+
+    #particles-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 720px;
+      min-width: 540px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .video-wrapper iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .quote-card {
+      margin-top: 2rem;
+      padding: 1.5rem 2rem;
+      background: var(--surface);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+    }
+
+    .quote-text {
+      font-size: 1.25rem;
+      line-height: 1.6;
+      font-style: italic;
+      color: var(--primary);
+    }
+
+    .blocked-url {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: var(--secondary);
+      opacity: 0.7;
+    }
+
+    .loading {
+      opacity: 0.6;
+    }
+
+    @media (max-width: 480px) {
+      .quote-text {
+        font-size: 1rem;
+      }
+
+      body {
+        padding: 1rem;
+      }
+    }
+  </style>
 </head>
+
 <body>
-<main>
-  <div id="particles-container" role="img" aria-label="Animated particle background"></div>
-  <div class="container">
-    <div class="video-wrapper" id="videoWrapper">
-      <div class="loading" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.1rem;">Loading video...</div>
+  <main>
+    <div id="particles-container" role="img" aria-label="Animated particle background"></div>
+    <div class="container">
+      <div class="video-wrapper" id="videoWrapper">
+        <div class="loading"
+          style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.1rem;">Loading video...
+        </div>
+      </div>
+      <div class="quote-card" id="quoteCard">
+        <div class="quote-text" id="quoteText">Loading...</div>
+      </div>
+      <div class="blocked-url" id="blockedUrl"></div>
     </div>
-    <div class="quote-card" id="quoteCard">
-      <div class="quote-text" id="quoteText">Loading...</div>
-    </div>
-    <div class="blocked-url" id="blockedUrl"></div>
-  </div>
-</main>
-<script type="module" src="./main.ts"></script>
+  </main>
+  <script type="module" src="./main.ts"></script>
 </body>
+
 </html>
